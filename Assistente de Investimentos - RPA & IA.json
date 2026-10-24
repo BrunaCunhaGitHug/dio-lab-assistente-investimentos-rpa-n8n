@@ -1,0 +1,86 @@
+{
+  "name": "Assistente de Investimentos - RPA & IA",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "investimentos-clientes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        -32
+      ],
+      "id": "e2670ec6-8c56-43e7-9954-c08cd1b1cd0c",
+      "name": "Webhook (Entrada)",
+      "webhookId": "3b279a2b-6c6a-45db-8110-48740b0a09c3"
+    },
+    {
+      "parameters": {
+        "url": "https://raw.githubusercontent.com/BrunaCunhaGitHug/dio-lab-assistente-investimentos-rpa-n8n/main/docs/data.csv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        -32
+      ],
+      "id": "c4b33429-e57a-4469-8df2-58bbe9679e73",
+      "name": "Ler Investimentos (CSV)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cliente = $('Webhook (Entrada)').first().json.body;\nconst csvData = $input.first().json.data;\n\n// Mapeamento simples de opções por perfil\nlet recomendacao = \"Renda Fixa / Tesouro Direto\";\nif (cliente.perfil.toLowerCase().includes('moderado')) {\n  recomendacao = \"Fundos Imobiliários e CDE\";\n} else if (cliente.perfil.toLowerCase().includes('arrojado')) {\n  recomendacao = \"Ações e ETFs de Crescimento\";\n}\n\nreturn {\n  json: {\n    nome: cliente.nome,\n    email: cliente.email,\n    saldo: cliente.saldo,\n    perfil: cliente.perfil,\n    investimento_sugerido: recomendacao,\n    mensagem_personalizada: `Olá ${cliente.nome}! Identificamos seu perfil como ${cliente.perfil}. Com base no seu saldo disponível de ${cliente.saldo}, recomendamos a opção: ${recomendacao}.`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -32
+      ],
+      "id": "eb4c2953-4662-4adc-9651-3322a3e42a22",
+      "name": "Cruzar Dados & Mensagem"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook (Entrada)": {
+      "main": [
+        [
+          {
+            "node": "Ler Investimentos (CSV)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ler Investimentos (CSV)": {
+      "main": [
+        [
+          {
+            "node": "Cruzar Dados & Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "ff8c935a-b072-4884-8a2b-b6dcbefd10c2",
+  "meta": {
+    "instanceId": "b9a30f954c6e7136f140db605b96075c39b54beb2be53f5ef2f2ede3f085b051"
+  },
+  "nodeGroups": [],
+  "id": "jwj3E6pthsCP0jKJ",
+  "tags": []
+}
